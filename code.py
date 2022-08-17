@@ -4,6 +4,7 @@ from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
 from adafruit_hid.keycode import Keycode
 import board
+import analogio
 import digitalio
 import time
 
@@ -100,3 +101,64 @@ while True:
 ###
 # WINDOWS CODE
 ###
+mouse = Mouse(usb_hid.devices)
+kbd = Keyboard(usb_hid.devices)
+
+x_axis = analogio.AnalogIn(board.GP27)
+y_axis = analogio.AnalogIn(board.GP26)
+
+def get_value(pin):
+    return (pin.value * 3.3) / 65536
+
+def steps(axis):
+    return round((axis - pot_min) / step)
+
+while True:
+    x = get_value(x_axis)
+    y = get_value(y_axis)
+
+
+# navigate channels
+    if steps(x) > 11.0:
+        kbd.send(Keycode.ALT, Keycode.DOWN_ARROW)
+        time.sleep(0.5)        
+    if steps(x) < 9.0:
+        kbd.send(Keycode.ALT, Keycode.UP_ARROW)
+        time.sleep(0.5)   
+
+    if steps(x) > 19.0:
+        kbd.send(Keycode.ALT, Keycode.DOWN_ARROW)
+        time.sleep(0.5)   
+    if steps(x) < 1.0:
+        kbd.send(Keycode.ALT, Keycode.UP_ARROW)
+        time.sleep(0.5)
+
+# #navigate Servers
+#     if steps(x) > 11.0:
+#         kbd.send(Keycode.LEFT_CONTROL, Keycode.ALT, Keycode.DOWN_ARROW)
+#         time.sleep(0.5)        
+#     if steps(x) < 9.0:
+#         kbd.send(Keycode.LEFT_CONTROL, Keycode.ALT, Keycode.UP_ARROW)
+#         time.sleep(0.5)   
+
+#     if steps(x) > 19.0:
+#         kbd.send(Keycode.LEFT_CONTROL, Keycode.ALT, Keycode.DOWN_ARROW)
+#         time.sleep(0.5)   
+#     if steps(x) < 1.0:
+#         kbd.send(Keycode.LEFT_CONTROL, Keycode.ALT, Keycode.UP_ARROW)
+#         time.sleep(0.5)      
+
+#navigate chat
+    if steps(y) > 11.0:
+        mouse.move(wheel=-1)
+        time.sleep(0.1)
+    if steps(y) < 9.0:
+        mouse.move(wheel=1)
+        time.sleep(0.1)
+
+    if steps(y) > 19.0:
+        mouse.move(wheel=-1)
+        time.sleep(0.1)
+    if steps(y) < 1.0:
+        mouse.move(wheel=1)
+        time.sleep(0.1)
